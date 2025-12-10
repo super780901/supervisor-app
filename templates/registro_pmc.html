@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervisor v.1 - Registro PMC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Estilos Embossed */
+        .embossed {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        }
+        .embossed-btn {
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            transition: all 0.1s;
+        }
+        .embossed-btn:active { transform: translateY(1px); }
+    </style>
+</head>
+<body class="bg-green-100 min-h-screen flex flex-col">
+
+    <header class="bg-blue-700 h-10 w-full flex items-center justify-between px-4 text-white shadow-lg">
+        <a href="{{ url_for('submenu_registro') }}" class="text-sm font-semibold hover:text-blue-200 transition">Regresar</a>
+        <div class="flex items-center space-x-4">
+            <span class="text-sm font-bold">Bienvenido, {{ user_name }}</span>
+            <a href="{{ url_for('login') }}" class="text-sm font-semibold hover:text-blue-200 transition">Salir</a>
+        </div>
+    </header>
+
+    <main class="flex-grow p-4 flex flex-col items-center">
+        <div class="w-full max-w-6xl space-y-4">
+            
+            <div class="embossed bg-white p-4 rounded-lg shadow-xl border border-gray-200 text-center">
+                <h1 class="text-2xl font-extrabold text-gray-800">Registro PMC: Gestión Escolar</h1>
+            </div>
+
+            <div class="embossed bg-white p-6 rounded-lg shadow-xl border border-gray-200">
+                <form action="{{ url_for('guardar_pmc') }}" method="POST">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Seleccione la Escuela:</label>
+                            <select name="escuela_id" class="w-full px-4 py-2 border border-gray-300 rounded shadow-inner" required>
+                                <option value="">-- Seleccionar --</option>
+                                {% for escuela in escuelas %}
+                                    <option value="{{ escuela.id }}">{{ escuela.nombre }} ({{ escuela.cct }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Fecha de Revisión:</label>
+                            <input type="date" name="fecha_revision" class="w-full px-4 py-2 border border-gray-300 rounded shadow-inner" required>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto mb-6">
+                        <table class="min-w-full border border-gray-300 text-sm">
+                            <thead>
+                                <tr class="bg-blue-100 text-blue-900">
+                                    <th class="border px-4 py-2 text-left w-1/12">No.</th>
+                                    <th class="border px-4 py-2 text-left w-5/12">Indicador</th>
+                                    <th class="border px-4 py-2 text-center w-1/12">SÍ</th>
+                                    <th class="border px-4 py-2 text-center w-1/12">NO</th>
+                                    <th class="border px-4 py-2 text-left w-4/12">Observaciones / Evidencias</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2 font-bold">1.1</td>
+                                    <td class="border px-4 py-2"><strong>Disponibilidad:</strong> ¿El documento está impreso y disponible para consulta inmediata?</td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_1" value="SI"></td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_1" value="NO"></td>
+                                    <td class="border px-4 py-2"><input type="text" name="obs_1_1" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2 font-bold">1.2</td>
+                                    <td class="border px-4 py-2"><strong>Diagnóstico:</strong> ¿Inicia con la "Lectura de la Realidad" basada en datos?</td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_2" value="SI"></td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_2" value="NO"></td>
+                                    <td class="border px-4 py-2"><input type="text" name="obs_1_2" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2 font-bold">1.3</td>
+                                    <td class="border px-4 py-2"><strong>Objetivos:</strong> ¿Plantea objetivos claros atendiendo las problemáticas detectadas?</td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_3" value="SI"></td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_3" value="NO"></td>
+                                    <td class="border px-4 py-2"><input type="text" name="obs_1_3" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2 font-bold">1.4</td>
+                                    <td class="border px-4 py-2"><strong>Metas:</strong> ¿Establece metas específicas, medibles y alcanzables?</td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_4" value="SI"></td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_4" value="NO"></td>
+                                    <td class="border px-4 py-2"><input type="text" name="obs_1_4" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2 font-bold">1.5</td>
+                                    <td class="border px-4 py-2"><strong>Plan de Acciones:</strong> ¿Cuenta con descripción de actividades, responsables y fechas?</td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_5" value="SI"></td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_5" value="NO"></td>
+                                    <td class="border px-4 py-2"><input type="text" name="obs_1_5" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2 font-bold">1.6</td>
+                                    <td class="border px-4 py-2"><strong>Seguimiento:</strong> ¿Existen evidencias del cumplimiento de las acciones?</td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_6" value="SI"></td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_6" value="NO"></td>
+                                    <td class="border px-4 py-2"><input type="text" name="obs_1_6" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2 font-bold">1.7</td>
+                                    <td class="border px-4 py-2"><strong>Consenso:</strong> ¿Está firmado por el personal docente (Colectivo Escolar)?</td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_7" value="SI"></td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_7" value="NO"></td>
+                                    <td class="border px-4 py-2"><input type="text" name="obs_1_7" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border px-4 py-2 font-bold">1.8</td>
+                                    <td class="border px-4 py-2"><strong>Corresponsabilidad:</strong> ¿Es del conocimiento del CEPS/APF y cuenta con firma?</td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_8" value="SI"></td>
+                                    <td class="border px-4 py-2 text-center"><input type="radio" name="ind_1_8" value="NO"></td>
+                                    <td class="border px-4 py-2"><input type="text" name="obs_1_8" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="flex justify-center space-x-4">
+                        <a href="{{ url_for('submenu_registro') }}" class="embossed-btn bg-gray-500 text-white font-bold py-2 px-6 rounded hover:bg-gray-600 transition">
+                            Regresar
+                        </a>
+                        <button type="submit" class="embossed-btn bg-green-600 text-white font-bold py-2 px-6 rounded hover:bg-green-700 transition">
+                            Guardar Información
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+            
+        </div>
+    </main>
+
+    <footer class="bg-gray-200 mt-auto py-3 text-sm text-gray-600 text-center border-t border-gray-300 shadow-inner">
+        <div class="w-full max-w-4xl mx-auto px-4">
+            <p>&copy; 2025 Supervisor v.1. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>
