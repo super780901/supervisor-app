@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask import make_response # Agrega esto si no está
+from weasyprint import HTML     # Esto es lo nuevo
 
 # Inicializa la aplicación Flask
 app = Flask(__name__)
@@ -677,6 +679,301 @@ def guardar_inventario():
     db.session.add(nuevo)
     db.session.commit()
     return redirect(url_for('submenu_registro'))
+
+
+# --- MODELO INFRAESTRUCTURA (Grupo 7 - Actualizado a 18 items) ---
+class Infraestructura(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    escuela_id = db.Column(db.Integer, db.ForeignKey('escuela.id'), nullable=False)
+    
+    # Indicadores 7.1 al 7.18
+    ind_7_1 = db.Column(db.String(5)); obs_7_1 = db.Column(db.String(200))
+    ind_7_2 = db.Column(db.String(5)); obs_7_2 = db.Column(db.String(200))
+    ind_7_3 = db.Column(db.String(5)); obs_7_3 = db.Column(db.String(200))
+    ind_7_4 = db.Column(db.String(5)); obs_7_4 = db.Column(db.String(200))
+    ind_7_5 = db.Column(db.String(5)); obs_7_5 = db.Column(db.String(200))
+    ind_7_6 = db.Column(db.String(5)); obs_7_6 = db.Column(db.String(200))
+    ind_7_7 = db.Column(db.String(5)); obs_7_7 = db.Column(db.String(200))
+    ind_7_8 = db.Column(db.String(5)); obs_7_8 = db.Column(db.String(200))
+    ind_7_9 = db.Column(db.String(5)); obs_7_9 = db.Column(db.String(200))
+    ind_7_10 = db.Column(db.String(5)); obs_7_10 = db.Column(db.String(200))
+    ind_7_11 = db.Column(db.String(5)); obs_7_11 = db.Column(db.String(200))
+    ind_7_12 = db.Column(db.String(5)); obs_7_12 = db.Column(db.String(200))
+    ind_7_13 = db.Column(db.String(5)); obs_7_13 = db.Column(db.String(200))
+    ind_7_14 = db.Column(db.String(5)); obs_7_14 = db.Column(db.String(200))
+    ind_7_15 = db.Column(db.String(5)); obs_7_15 = db.Column(db.String(200))
+    ind_7_16 = db.Column(db.String(5)); obs_7_16 = db.Column(db.String(200))
+    ind_7_17 = db.Column(db.String(5)); obs_7_17 = db.Column(db.String(200))
+    ind_7_18 = db.Column(db.String(5)); obs_7_18 = db.Column(db.String(200))
+
+    # Campos de texto abiertos
+    riesgos_detectados = db.Column(db.Text)
+    necesidades_mantenimiento = db.Column(db.Text)
+    acuerdos = db.Column(db.Text)
+
+# --- RUTAS INFRAESTRUCTURA ---
+# --- RUTAS INFRAESTRUCTURA ---
+@app.route('/registro_infraestructura')
+def registro_infraestructura():
+    if not session.get('user_id'): return redirect(url_for('login'))
+    user_name = session.get('user_name')
+    mis_escuelas = Escuela.query.filter_by(user_id=session['user_id']).all()
+    return render_template('registro_infraestructura.html', user_name=user_name, escuelas=mis_escuelas)
+
+@app.route('/guardar_infraestructura', methods=['POST'])
+def guardar_infraestructura():
+    if not session.get('user_id'): return redirect(url_for('login'))
+    
+    nuevo = Infraestructura(
+        user_id=session['user_id'],
+        escuela_id=request.form.get('escuela_id'),
+        fecha=request.form.get('fecha_revision'),
+        
+        # Indicadores del 1 al 18
+        ind_7_1=request.form.get('ind_7_1'), obs_7_1=request.form.get('obs_7_1'),
+        ind_7_2=request.form.get('ind_7_2'), obs_7_2=request.form.get('obs_7_2'),
+        ind_7_3=request.form.get('ind_7_3'), obs_7_3=request.form.get('obs_7_3'),
+        ind_7_4=request.form.get('ind_7_4'), obs_7_4=request.form.get('obs_7_4'),
+        ind_7_5=request.form.get('ind_7_5'), obs_7_5=request.form.get('obs_7_5'),
+        ind_7_6=request.form.get('ind_7_6'), obs_7_6=request.form.get('obs_7_6'),
+        ind_7_7=request.form.get('ind_7_7'), obs_7_7=request.form.get('obs_7_7'),
+        ind_7_8=request.form.get('ind_7_8'), obs_7_8=request.form.get('obs_7_8'),
+        ind_7_9=request.form.get('ind_7_9'), obs_7_9=request.form.get('obs_7_9'),
+        ind_7_10=request.form.get('ind_7_10'), obs_7_10=request.form.get('obs_7_10'),
+        ind_7_11=request.form.get('ind_7_11'), obs_7_11=request.form.get('obs_7_11'),
+        ind_7_12=request.form.get('ind_7_12'), obs_7_12=request.form.get('obs_7_12'),
+        ind_7_13=request.form.get('ind_7_13'), obs_7_13=request.form.get('obs_7_13'),
+        ind_7_14=request.form.get('ind_7_14'), obs_7_14=request.form.get('obs_7_14'),
+        ind_7_15=request.form.get('ind_7_15'), obs_7_15=request.form.get('obs_7_15'),
+        ind_7_16=request.form.get('ind_7_16'), obs_7_16=request.form.get('obs_7_16'),
+        ind_7_17=request.form.get('ind_7_17'), obs_7_17=request.form.get('obs_7_17'),
+        ind_7_18=request.form.get('ind_7_18'), obs_7_18=request.form.get('obs_7_18'),
+
+        riesgos_detectados=request.form.get('riesgos_detectados'),
+        necesidades_mantenimiento=request.form.get('necesidades_mantenimiento'),
+        acuerdos=request.form.get('acuerdos')
+    )
+    db.session.add(nuevo)
+    db.session.commit()
+    return redirect(url_for('submenu_registro'))
+
+# --- MODELO CONTROL ESCOLAR (Grupo 8) ---
+class ControlEscolar(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    escuela_id = db.Column(db.Integer, db.ForeignKey('escuela.id'), nullable=False)
+    
+    # Indicadores 8.1 al 8.11
+    ind_8_1 = db.Column(db.String(5)); obs_8_1 = db.Column(db.String(200))
+    ind_8_2 = db.Column(db.String(5)); obs_8_2 = db.Column(db.String(200))
+    ind_8_3 = db.Column(db.String(5)); obs_8_3 = db.Column(db.String(200))
+    ind_8_4 = db.Column(db.String(5)); obs_8_4 = db.Column(db.String(200))
+    ind_8_5 = db.Column(db.String(5)); obs_8_5 = db.Column(db.String(200))
+    ind_8_6 = db.Column(db.String(5)); obs_8_6 = db.Column(db.String(200))
+    ind_8_7 = db.Column(db.String(5)); obs_8_7 = db.Column(db.String(200))
+    ind_8_8 = db.Column(db.String(5)); obs_8_8 = db.Column(db.String(200))
+    ind_8_9 = db.Column(db.String(5)); obs_8_9 = db.Column(db.String(200))
+    ind_8_10 = db.Column(db.String(5)); obs_8_10 = db.Column(db.String(200))
+    ind_8_11 = db.Column(db.String(5)); obs_8_11 = db.Column(db.String(200))
+
+    # Campos de texto abiertos
+    inconsistencias = db.Column(db.Text)
+    situacion_bap = db.Column(db.Text)
+    observaciones_generales = db.Column(db.Text)
+
+
+# --- MODELO PIPCE (Grupo 10 - Actualizado 11 items) ---
+class PIPCE(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    escuela_id = db.Column(db.Integer, db.ForeignKey('escuela.id'), nullable=False)
+    
+    # Indicadores 10.1 al 10.11
+    ind_10_1 = db.Column(db.String(5)); obs_10_1 = db.Column(db.String(200))
+    ind_10_2 = db.Column(db.String(5)); obs_10_2 = db.Column(db.String(200))
+    ind_10_3 = db.Column(db.String(5)); obs_10_3 = db.Column(db.String(200))
+    ind_10_4 = db.Column(db.String(5)); obs_10_4 = db.Column(db.String(200))
+    ind_10_5 = db.Column(db.String(5)); obs_10_5 = db.Column(db.String(200))
+    ind_10_6 = db.Column(db.String(5)); obs_10_6 = db.Column(db.String(200))
+    ind_10_7 = db.Column(db.String(5)); obs_10_7 = db.Column(db.String(200))
+    ind_10_8 = db.Column(db.String(5)); obs_10_8 = db.Column(db.String(200))
+    ind_10_9 = db.Column(db.String(5)); obs_10_9 = db.Column(db.String(200))
+    ind_10_10 = db.Column(db.String(5)); obs_10_10 = db.Column(db.String(200))
+    ind_10_11 = db.Column(db.String(5)); obs_10_11 = db.Column(db.String(200))
+
+    # Campos de texto abiertos
+    riesgos_detectados = db.Column(db.Text)
+    estado_equipamiento = db.Column(db.Text)
+    acuerdos_seguridad = db.Column(db.Text)
+
+# --- RUTAS CONTROL ESCOLAR ---
+@app.route('/registro_control_escolar')
+def registro_control_escolar():
+    if not session.get('user_id'): return redirect(url_for('login'))
+    user_name = session.get('user_name')
+    mis_escuelas = Escuela.query.filter_by(user_id=session['user_id']).all()
+    return render_template('registro_control_escolar.html', user_name=user_name, escuelas=mis_escuelas)
+
+@app.route('/guardar_control_escolar', methods=['POST'])
+def guardar_control_escolar():
+    if not session.get('user_id'): return redirect(url_for('login'))
+    
+    nuevo = ControlEscolar(
+        user_id=session['user_id'],
+        escuela_id=request.form.get('escuela_id'),
+        fecha=request.form.get('fecha_revision'),
+        
+        ind_8_1=request.form.get('ind_8_1'), obs_8_1=request.form.get('obs_8_1'),
+        ind_8_2=request.form.get('ind_8_2'), obs_8_2=request.form.get('obs_8_2'),
+        ind_8_3=request.form.get('ind_8_3'), obs_8_3=request.form.get('obs_8_3'),
+        ind_8_4=request.form.get('ind_8_4'), obs_8_4=request.form.get('obs_8_4'),
+        ind_8_5=request.form.get('ind_8_5'), obs_8_5=request.form.get('obs_8_5'),
+        ind_8_6=request.form.get('ind_8_6'), obs_8_6=request.form.get('obs_8_6'),
+        ind_8_7=request.form.get('ind_8_7'), obs_8_7=request.form.get('obs_8_7'),
+        ind_8_8=request.form.get('ind_8_8'), obs_8_8=request.form.get('obs_8_8'),
+        ind_8_9=request.form.get('ind_8_9'), obs_8_9=request.form.get('obs_8_9'),
+        ind_8_10=request.form.get('ind_8_10'), obs_8_10=request.form.get('obs_8_10'),
+        ind_8_11=request.form.get('ind_8_11'), obs_8_11=request.form.get('obs_8_11'),
+
+        inconsistencias=request.form.get('inconsistencias'),
+        situacion_bap=request.form.get('situacion_bap'),
+        observaciones_generales=request.form.get('observaciones_generales')
+    )
+    db.session.add(nuevo)
+    db.session.commit()
+    return redirect(url_for('submenu_registro'))
+
+# --- RUTAS PIPCE (Protección Civil) ---
+@app.route('/registro_pipce')
+def registro_pipce():
+    if not session.get('user_id'): return redirect(url_for('login'))
+    user_name = session.get('user_name')
+    mis_escuelas = Escuela.query.filter_by(user_id=session['user_id']).all()
+    return render_template('registro_pipce.html', user_name=user_name, escuelas=mis_escuelas)
+
+@app.route('/guardar_pipce', methods=['POST'])
+def guardar_pipce():
+    if not session.get('user_id'): return redirect(url_for('login'))
+    
+    # 1. CREAMOS LA VARIABLE 'nuevo' CON TODOS LOS DATOS
+    # (Esta es la parte que probablemente faltaba o estaba incompleta)
+    nuevo = PIPCE(
+        user_id=session['user_id'],
+        escuela_id=request.form.get('escuela_id'),
+        fecha=request.form.get('fecha_revision'),
+        
+        # Indicadores 10.1 al 10.11
+        ind_10_1=request.form.get('ind_10_1'), obs_10_1=request.form.get('obs_10_1'),
+        ind_10_2=request.form.get('ind_10_2'), obs_10_2=request.form.get('obs_10_2'),
+        ind_10_3=request.form.get('ind_10_3'), obs_10_3=request.form.get('obs_10_3'),
+        ind_10_4=request.form.get('ind_10_4'), obs_10_4=request.form.get('obs_10_4'),
+        ind_10_5=request.form.get('ind_10_5'), obs_10_5=request.form.get('obs_10_5'),
+        ind_10_6=request.form.get('ind_10_6'), obs_10_6=request.form.get('obs_10_6'),
+        ind_10_7=request.form.get('ind_10_7'), obs_10_7=request.form.get('obs_10_7'),
+        ind_10_8=request.form.get('ind_10_8'), obs_10_8=request.form.get('obs_10_8'),
+        ind_10_9=request.form.get('ind_10_9'), obs_10_9=request.form.get('obs_10_9'),
+        ind_10_10=request.form.get('ind_10_10'), obs_10_10=request.form.get('obs_10_10'),
+        ind_10_11=request.form.get('ind_10_11'), obs_10_11=request.form.get('obs_10_11'),
+
+        riesgos_detectados=request.form.get('riesgos_detectados'),
+        estado_equipamiento=request.form.get('estado_equipamiento'),
+        acuerdos_seguridad=request.form.get('acuerdos_seguridad')
+    )
+
+    # 2. GUARDAMOS EN LA BASE DE DATOS
+    db.session.add(nuevo)
+    db.session.commit()
+    
+    # 3. AHORA SÍ, REDIRIGIMOS AL PDF (Porque 'nuevo' ya existe y tiene ID)
+    return redirect(url_for('descargar_pdf_pipce', id_reporte=nuevo.id))
+
+# --- RUTA PARA DESCARGAR PDF (WEASYPRINT) ---
+@app.route('/descargar_pdf_pipce/<int:id_reporte>')
+def descargar_pdf_pipce(id_reporte):
+    if not session.get('user_id'): return redirect(url_for('login'))
+    
+    # 1. Buscamos el reporte en la Base de Datos
+    reporte = PIPCE.query.get_or_404(id_reporte)
+    escuela = Escuela.query.get(reporte.escuela_id)
+    
+    # CORRECCIÓN: AHORA USAMOS LAS FRASES COMPLETAS TAL CUAL ESTÁN EN EL FORMULARIO
+    lista_indicadores = [
+        {
+            "texto": "Documento Vigente: ¿El PIPCE está actualizado y validado por la autoridad correspondiente?",
+            "valor": reporte.ind_10_1, "obs": reporte.obs_10_1
+        },
+        {
+            "texto": "Unidad Interna (UIPC): ¿Está formalmente constituida el Acta de Instalación de la UIPC con firmas?",
+            "valor": reporte.ind_10_2, "obs": reporte.obs_10_2
+        },
+        {
+            "texto": "Análisis de Riesgos: ¿Incluye diagnóstico de riesgos internos (instalaciones) y externos?",
+            "valor": reporte.ind_10_3, "obs": reporte.obs_10_3
+        },
+        {
+            "texto": "Brigadas Constituidas: ¿Existen las 4 brigadas básicas (Evacuación, Primeros Auxilios, Incendios, Búsqueda)?",
+            "valor": reporte.ind_10_4, "obs": reporte.obs_10_4
+        },
+        {
+            "texto": "Directorios de Emergencia: ¿Los números de emergencia están actualizados y visibles?",
+            "valor": reporte.ind_10_5, "obs": reporte.obs_10_5
+        },
+        {
+            "texto": "Equipamiento (Extintores): ¿Cuentan con extintores suficientes, vigentes y bien colocados?",
+            "valor": reporte.ind_10_6, "obs": reporte.obs_10_6
+        },
+        {
+            "texto": "Sistema de Alertamiento: ¿Disponen de alarma audible en todo el plantel conocida por la comunidad?",
+            "valor": reporte.ind_10_7, "obs": reporte.obs_10_7
+        },
+        {
+            "texto": "Señalización Normativa: ¿Cuentan con señales oficiales (Ruta de Evacuación, Punto de Reunión)?",
+            "valor": reporte.ind_10_8, "obs": reporte.obs_10_8
+        },
+        {
+            "texto": "Cronograma de Riesgos: ¿La programación de simulacros contempla distintos escenarios de riesgo?",
+            "valor": reporte.ind_10_9, "obs": reporte.obs_10_9
+        },
+        {
+            "texto": "Capacitación: ¿El personal y brigadas han recibido capacitación reciente en protección civil?",
+            "valor": reporte.ind_10_10, "obs": reporte.obs_10_10
+        },
+        {
+            "texto": "Evaluación y Bitácora: ¿Se realiza una evaluación posterior a cada simulacro y se registran los resultados en la bitácora?",
+            "valor": reporte.ind_10_11, "obs": reporte.obs_10_11
+        },
+    ]
+
+    # 3. Renderizamos el HTML limpio (sin estilo web, solo estilo papel)
+    html_string = render_template('pdf_pipce.html',
+                                  escuela=escuela.nombre,
+                                  fecha=reporte.fecha,
+                                  supervisor=session.get('user_name'),
+                                  indicadores=lista_indicadores,
+                                  riesgos=reporte.riesgos_detectados,
+                                  equipamiento=reporte.estado_equipamiento,
+                                  acuerdos=reporte.acuerdos_seguridad)
+
+    # --- AGREGA ESTA LÍNEA DE DIAGNÓSTICO ---
+    print("--- INICIO HTML ---")
+    print(html_string) 
+    print("--- FIN HTML ---")
+    # ----------------------------------------
+    
+    
+    # 4. Magia de WeasyPrint: Convertir a PDF
+    pdf = HTML(string=html_string).write_pdf()
+
+    # 5. Entregar el archivo al navegador
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    # 'inline' para ver en navegador, 'attachment' para bajar directo
+    response.headers['Content-Disposition'] = f'attachment; filename=PIPCE_{escuela.nombre}.pdf'
+    return response
 # --------------------------
 # EJECUCIÓN
 # --------------------------

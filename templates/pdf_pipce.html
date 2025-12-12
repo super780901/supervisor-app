@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte PIPCE</title>
+    <style>
+        /* CONFIGURACIÓN DE PÁGINA */
+        @page {
+            size: Letter; /* O 'A4' */
+            margin: 2cm; /* Márgenes reales de impresora */
+            
+            /* Encabezado en todas las páginas */
+            @top-center {
+                content: "PROGRAMA INTERNO DE PROTECCIÓN CIVIL ESCOLAR";
+                font-family: sans-serif;
+                font-size: 10px;
+                color: #555;
+            }
+            /* Pie de página con número */
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: sans-serif;
+                font-size: 10px;
+            }
+        }
+
+        body {
+            font-family: sans-serif; /* Quitamos 'Arial' explícito */
+            /* ... */
+        }
+        /* TAMBIÉN EN @page */
+        @top-center {
+            content: "PROGRAMA INTERNO DE PROTECCIÓN CIVIL ESCOLAR";
+            font-family: sans-serif; /* Asegura esto también */
+            /* ... */
+        }
+        @bottom-right {
+            font-family: sans-serif; /* Y esto */
+            /* ... */
+        }
+
+        /* Títulos */
+        h2 { text-align: center; text-transform: uppercase; font-size: 14px; margin-bottom: 5px; border-bottom: 2px solid #000; padding-bottom: 5px; }
+        .datos-generales { width: 100%; margin-bottom: 15px; font-weight: bold; font-size: 12px; }
+        
+        /* Tablas */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { border: 1px solid #000; padding: 5px; text-align: left; vertical-align: top; }
+        th { background-color: #f0f0f0; text-align: center; font-weight: bold; }
+        
+        /* MAGIA PARA NO CORTAR FILAS */
+        tr { page-break-inside: avoid; }
+        
+        /* Cajas de Texto Abierto */
+        .seccion-texto { 
+            margin-bottom: 15px; 
+            page-break-inside: avoid; /* Evita que el título quede en una hoja y el texto en otra */
+        }
+        .titulo-seccion { font-weight: bold; background: #eee; padding: 3px; border: 1px solid #000; display: block; }
+        .contenido-seccion { 
+            border: 1px solid #000; 
+            border-top: none; 
+            padding: 8px; 
+            min-height: 40px; 
+            white-space: pre-wrap; /* Respeta los enters del usuario */
+            text-align: justify;
+        }
+
+        /* Firmas */
+        .firmas { margin-top: 40px; width: 100%; page-break-inside: avoid; }
+        .firma-box { width: 45%; float: left; text-align: center; }
+        .firma-linea { border-top: 1px solid #000; margin: 0 20px; padding-top: 5px; }
+        
+        /* Limpiar flotantes */
+        .clearfix::after { content: ""; clear: both; display: table; }
+    </style>
+</head>
+<body>
+
+    <h2>REPORTE DE VISITA: PIPCE</h2>
+
+    <div class="datos-generales clearfix">
+        <div style="float:left;">ESCUELA: {{ escuela }}</div>
+        <div style="float:right;">FECHA: {{ fecha }}</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 5%;">No.</th>
+                <th style="width: 50%;">Indicador</th>
+                <th style="width: 5%;">SÍ</th>
+                <th style="width: 5%;">NO</th>
+                <th style="width: 35%;">Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in indicadores %}
+            <tr>
+                <td style="text-align: center;">10.{{ loop.index }}</td>
+                <td>{{ item.texto }}</td>
+                <td style="text-align: center;">{% if item.valor == 'SI' %}X{% endif %}</td>
+                <td style="text-align: center;">{% if item.valor == 'NO' %}X{% endif %}</td>
+                <td>{{ item.obs }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="seccion-texto">
+        <span class="titulo-seccion">RIESGOS DETECTADOS</span>
+        <div class="contenido-seccion">{{ riesgos }}</div>
+    </div>
+
+    <div class="seccion-texto">
+        <span class="titulo-seccion">ESTADO DEL EQUIPAMIENTO</span>
+        <div class="contenido-seccion">{{ equipamiento }}</div>
+    </div>
+
+    <div class="seccion-texto">
+        <span class="titulo-seccion">ACUERDOS Y COMPROMISOS</span>
+        <div class="contenido-seccion">{{ acuerdos }}</div>
+    </div>
+
+    <div class="firmas clearfix">
+        <div class="firma-box">
+            <br><br><br>
+            <div class="firma-linea">
+                <strong>{{ supervisor }}</strong><br>
+                SUPERVISOR ESCOLAR
+            </div>
+        </div>
+        <div style="float:right;" class="firma-box">
+            <br><br><br>
+            <div class="firma-linea">
+                <strong>DIRECTOR / ENCARGADO</strong><br>
+                Nombre y Firma
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
