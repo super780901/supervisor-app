@@ -82,60 +82,43 @@ class Escuela(db.Model):
 
 
 
+# --- MODELO PMC (Módulo 1 - ACTUALIZADO A 10 PUNTOS) ---
 class PMC(db.Model):
-    """
-    Tabla para guardar el Registro de Programa de Mejora Continua (PMC).
-    """
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.String(20), nullable=False) # Guardaremos la fecha como texto YYYY-MM-DD
-    
-    # Relaciones
+    fecha = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     escuela_id = db.Column(db.Integer, db.ForeignKey('escuela.id'), nullable=False)
     
-    # Indicadores (Guardaremos SI/NO y Observaciones para cada uno)
-    # 1.1 Disponibilidad
-    ind_1_1 = db.Column(db.String(5))
-    obs_1_1 = db.Column(db.String(200))
-    # 1.2 Diagnóstico
-    ind_1_2 = db.Column(db.String(5))
-    obs_1_2 = db.Column(db.String(200))
-    # 1.3 Objetivos
-    ind_1_3 = db.Column(db.String(5))
-    obs_1_3 = db.Column(db.String(200))
-    # 1.4 Metas
-    ind_1_4 = db.Column(db.String(5))
-    obs_1_4 = db.Column(db.String(200))
-    # 1.5 Plan de Acciones
-    ind_1_5 = db.Column(db.String(5))
-    obs_1_5 = db.Column(db.String(200))
-    # 1.6 Seguimiento
-    ind_1_6 = db.Column(db.String(5))
-    obs_1_6 = db.Column(db.String(200))
-    # 1.7 Consenso
-    ind_1_7 = db.Column(db.String(5))
-    obs_1_7 = db.Column(db.String(200))
-    # 1.8 Corresponsabilidad
-    ind_1_8 = db.Column(db.String(5))
-    obs_1_8 = db.Column(db.String(200))
+    # Indicadores 1.1 al 1.10
+    ind_1_1 = db.Column(db.String(5)); obs_1_1 = db.Column(db.String(200))
+    ind_1_2 = db.Column(db.String(5)); obs_1_2 = db.Column(db.String(200))
+    ind_1_3 = db.Column(db.String(5)); obs_1_3 = db.Column(db.String(200))
+    ind_1_4 = db.Column(db.String(5)); obs_1_4 = db.Column(db.String(200))
+    ind_1_5 = db.Column(db.String(5)); obs_1_5 = db.Column(db.String(200))
+    ind_1_6 = db.Column(db.String(5)); obs_1_6 = db.Column(db.String(200))
+    ind_1_7 = db.Column(db.String(5)); obs_1_7 = db.Column(db.String(200))
+    ind_1_8 = db.Column(db.String(5)); obs_1_8 = db.Column(db.String(200))
+    ind_1_9 = db.Column(db.String(5)); obs_1_9 = db.Column(db.String(200)) # Esto era lo que faltaba
+    ind_1_10 = db.Column(db.String(5)); obs_1_10 = db.Column(db.String(200)) # Y esto
+
+    # Campos de texto abiertos
+    comentarios_generales = db.Column(db.Text)
+    metas_prioritarias = db.Column(db.Text)
+    acuerdos = db.Column(db.Text)
 
     def __repr__(self):
         return f'<PMC ID: {self.id}>'
     
 # app.py - Agregar debajo de la clase PMC
 
+# --- MODELO APF (Módulo 2 - ACTUALIZADO) ---
 class APF(db.Model):
-    """
-    Tabla para el registro de Asociación de Madres y Padres de Familia (APF).
-    """
     id = db.Column(db.Integer, primary_key=True)
     fecha = db.Column(db.String(20), nullable=False)
-    
-    # Relaciones
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     escuela_id = db.Column(db.Integer, db.ForeignKey('escuela.id'), nullable=False)
     
-    # Indicadores (2.1 a 2.12) - Guardamos SI/NO y Observaciones
+    # 10 Indicadores
     ind_2_1 = db.Column(db.String(5)); obs_2_1 = db.Column(db.String(200))
     ind_2_2 = db.Column(db.String(5)); obs_2_2 = db.Column(db.String(200))
     ind_2_3 = db.Column(db.String(5)); obs_2_3 = db.Column(db.String(200))
@@ -146,14 +129,11 @@ class APF(db.Model):
     ind_2_8 = db.Column(db.String(5)); obs_2_8 = db.Column(db.String(200))
     ind_2_9 = db.Column(db.String(5)); obs_2_9 = db.Column(db.String(200))
     ind_2_10 = db.Column(db.String(5)); obs_2_10 = db.Column(db.String(200))
-    ind_2_11 = db.Column(db.String(5)); obs_2_11 = db.Column(db.String(200))
-    ind_2_12 = db.Column(db.String(5)); obs_2_12 = db.Column(db.String(200))
 
-    # Campos de Texto Abierto (Fortalezas, Debilidades, Áreas de Oportunidad)
-    fortalezas = db.Column(db.Text)
-    debilidades = db.Column(db.Text)
-    areas_oportunidad = db.Column(db.Text)
-
+    # Campos de Texto (Específicos para APF)
+    manejo_recursos = db.Column(db.Text)      # Dinero, cuentas claras
+    participacion_social = db.Column(db.Text) # Eventos, faenas
+    acuerdos_apf = db.Column(db.Text)         # Compromisos de la mesa directiva
 
     def __repr__(self):
         return f'<APF ID: {self.id}>'    
@@ -352,36 +332,85 @@ def registro_pmc():
 # 2. RUTA PARA GUARDAR LOS DATOS
 @app.route('/guardar_pmc', methods=['POST'])
 def guardar_pmc():
-    if not session.get('user_id'):
-        return redirect(url_for('login'))
-
-    # Recogemos datos
-    escuela_id = request.form.get('escuela_id')
-    fecha = request.form.get('fecha_revision')
+    if not session.get('user_id'): return redirect(url_for('login'))
     
-    # Guardamos en la nueva tabla
-    nuevo_pmc = PMC(
+    # Recogemos los datos (Asegúrate de que coincida con tu Modelo PMC existente)
+    nuevo = PMC(
         user_id=session['user_id'],
-        escuela_id=escuela_id,
-        fecha=fecha,
-        ind_1_1 = request.form.get('ind_1_1'), obs_1_1 = request.form.get('obs_1_1'),
-        ind_1_2 = request.form.get('ind_1_2'), obs_1_2 = request.form.get('obs_1_2'),
-        ind_1_3 = request.form.get('ind_1_3'), obs_1_3 = request.form.get('obs_1_3'),
-        ind_1_4 = request.form.get('ind_1_4'), obs_1_4 = request.form.get('obs_1_4'),
-        ind_1_5 = request.form.get('ind_1_5'), obs_1_5 = request.form.get('obs_1_5'),
-        ind_1_6 = request.form.get('ind_1_6'), obs_1_6 = request.form.get('obs_1_6'),
-        ind_1_7 = request.form.get('ind_1_7'), obs_1_7 = request.form.get('obs_1_7'),
-        ind_1_8 = request.form.get('ind_1_8'), obs_1_8 = request.form.get('obs_1_8')
+        escuela_id=request.form.get('escuela_id'),
+        fecha=request.form.get('fecha_revision'),
+        
+        # Indicadores 1.1 al 1.10 (ajusta si tienes más o menos)
+        ind_1_1=request.form.get('ind_1_1'), obs_1_1=request.form.get('obs_1_1'),
+        ind_1_2=request.form.get('ind_1_2'), obs_1_2=request.form.get('obs_1_2'),
+        ind_1_3=request.form.get('ind_1_3'), obs_1_3=request.form.get('obs_1_3'),
+        ind_1_4=request.form.get('ind_1_4'), obs_1_4=request.form.get('obs_1_4'),
+        ind_1_5=request.form.get('ind_1_5'), obs_1_5=request.form.get('obs_1_5'),
+        ind_1_6=request.form.get('ind_1_6'), obs_1_6=request.form.get('obs_1_6'),
+        ind_1_7=request.form.get('ind_1_7'), obs_1_7=request.form.get('obs_1_7'),
+        ind_1_8=request.form.get('ind_1_8'), obs_1_8=request.form.get('obs_1_8'),
+        ind_1_9=request.form.get('ind_1_9'), obs_1_9=request.form.get('obs_1_9'),
+        ind_1_10=request.form.get('ind_1_10'), obs_1_10=request.form.get('obs_1_10'),
+
+        # Campos de texto (ajusta los nombres si usaste otros en tu modelo original)
+        comentarios_generales=request.form.get('comentarios_generales'),
+        metas_prioritarias=request.form.get('metas_prioritarias'),
+        acuerdos=request.form.get('acuerdos')
     )
-    
-    db.session.add(nuevo_pmc)
+    db.session.add(nuevo)
     db.session.commit()
     
-    return redirect(url_for('submenu_registro'))
+    # REDIRECCIÓN A DESCARGA PDF
+    return redirect(url_for('descargar_pdf_pmc', id_reporte=nuevo.id))
 
-# app.py - Rutas para APF
+# --- RUTA DE DESCARGA PMC (ACTUALIZADA) ---
 
-# app.py
+# --- RUTAS APF (Módulo 2) ---
+
+
+@app.route('/descargar_pdf_apf/<int:id_reporte>')
+def descargar_pdf_apf(id_reporte):
+    if not session.get('user_id'): return redirect(url_for('login'))
+    
+    reporte = APF.query.get_or_404(id_reporte)
+    escuela = Escuela.query.get(reporte.escuela_id)
+    
+    # DATOS DE ZONA (Igual que en PMC)
+    supervisor_user = User.query.get(session['user_id'])
+    nombre_supervisor = supervisor_user.username
+    nombre_zona = supervisor_user.nombre_cct
+    texto_zona_formal = f"ZONA ESCOLAR: {nombre_zona}"
+
+    # LISTA DE INDICADORES APF (Propuesta estándar)
+    lista_indicadores = [
+        {"texto": "¿Está constituida el Acta de la APF del ciclo escolar vigente?", "valor": reporte.ind_2_1, "obs": reporte.obs_2_1},
+        {"texto": "¿La Mesa Directiva cuenta con registro ante la autoridad educativa?", "valor": reporte.ind_2_2, "obs": reporte.obs_2_2},
+        {"texto": "¿Existe un Plan de Trabajo anual de la APF?", "valor": reporte.ind_2_3, "obs": reporte.obs_2_3},
+        {"texto": "¿Se realizan asambleas ordinarias informativas con los padres?", "valor": reporte.ind_2_4, "obs": reporte.obs_2_4},
+        {"texto": "¿Llevan libro de actas y acuerdos actualizado?", "valor": reporte.ind_2_5, "obs": reporte.obs_2_5},
+        {"texto": "¿Existe transparencia y cortes de caja sobre las aportaciones voluntarias?", "valor": reporte.ind_2_6, "obs": reporte.obs_2_6},
+        {"texto": "¿La APF apoya en el mantenimiento y limpieza del plantel?", "valor": reporte.ind_2_7, "obs": reporte.obs_2_7},
+        {"texto": "¿Participan en los Consejos de Participación Escolar?", "valor": reporte.ind_2_8, "obs": reporte.obs_2_8},
+        {"texto": "¿Existe un clima de colaboración entre APF y Dirección?", "valor": reporte.ind_2_9, "obs": reporte.obs_2_9},
+        {"texto": "¿Se respetan los reglamentos respecto al no condicionamiento de servicios?", "valor": reporte.ind_2_10, "obs": reporte.obs_2_10},
+    ]
+
+    html_string = render_template('pdf_apf.html',
+                                  escuela=escuela.nombre,
+                                  zona_escolar=texto_zona_formal,
+                                  fecha=reporte.fecha,
+                                  supervisor=nombre_supervisor,
+                                  indicadores=lista_indicadores,
+                                  recursos=reporte.manejo_recursos,
+                                  participacion=reporte.participacion_social,
+                                  acuerdos=reporte.acuerdos_apf)
+
+    pdf = HTML(string=html_string).write_pdf()
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=APF_{escuela.nombre}.pdf'
+    return response
+
 
 @app.route('/registro_apf')
 def registro_apf():
@@ -395,8 +424,8 @@ def registro_apf():
 @app.route('/guardar_apf', methods=['POST'])
 def guardar_apf():
     if not session.get('user_id'): return redirect(url_for('login'))
-
-    nuevo_apf = APF(
+    
+    nuevo = APF(
         user_id=session['user_id'],
         escuela_id=request.form.get('escuela_id'),
         fecha=request.form.get('fecha_revision'),
@@ -411,17 +440,15 @@ def guardar_apf():
         ind_2_8=request.form.get('ind_2_8'), obs_2_8=request.form.get('obs_2_8'),
         ind_2_9=request.form.get('ind_2_9'), obs_2_9=request.form.get('obs_2_9'),
         ind_2_10=request.form.get('ind_2_10'), obs_2_10=request.form.get('obs_2_10'),
-        ind_2_11=request.form.get('ind_2_11'), obs_2_11=request.form.get('obs_2_11'),
-        ind_2_12=request.form.get('ind_2_12'), obs_2_12=request.form.get('obs_2_12'),
 
-        fortalezas=request.form.get('fortalezas'),
-        debilidades=request.form.get('debilidades'),
-        areas_oportunidad=request.form.get('areas_oportunidad')
+        manejo_recursos=request.form.get('manejo_recursos'),
+        participacion_social=request.form.get('participacion_social'),
+        acuerdos_apf=request.form.get('acuerdos_apf')
     )
-    
-    db.session.add(nuevo_apf)
+    db.session.add(nuevo)
     db.session.commit()
-    return redirect(url_for('submenu_registro'))
+    
+    return redirect(url_for('descargar_pdf_apf', id_reporte=nuevo.id))
 
 
 
