@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* AJUSTE DE FUENTES Y MÁRGENES */
+        @page {
+            size: Letter;
+            margin-top: 3.5cm;
+            margin-bottom: 2cm;
+            margin-left: 2cm;
+            margin-right: 2cm;
+            
+            /* Encabezado en cada página */
+            @top-center {
+                content: element(header);
+                width: 100%;
+            }
+            /* Pie de página */
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: 'Arial', sans-serif; 
+                font-size: 9px;
+            }
+        }
+
+        body {
+            /* USAMOS ARIAL EXPLÍCITAMENTE PARA EVITAR TEXTO INVISIBLE */
+            font-family: 'Arial', sans-serif;
+            font-size: 10px;
+            line-height: 1.3;
+            color: #000000; /* Forzamos color negro */
+        }
+
+        /* CONFIGURACIÓN DEL ENCABEZADO REPETITIVO */
+        .header {
+            position: running(header);
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            margin-bottom: 0;
+        }
+        .header h1 { font-size: 14px; margin: 0; font-weight: bold; }
+        .header h2 { font-size: 12px; margin: 2px 0; font-weight: normal; }
+
+        /* TÍTULOS Y TABLAS */
+        .titulo-reporte {
+            text-align: center;
+            font-size: 12px;
+            background-color: #eee;
+            padding: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+            border: 1px solid #000;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { border: 1px solid #000; padding: 4px; text-align: left; vertical-align: top; }
+        th { background-color: #f0f0f0; text-align: center; font-weight: bold; }
+        
+        /* SECCIONES DE TEXTO */
+        .seccion { margin-bottom: 10px; page-break-inside: avoid; }
+        .titulo-sec {
+            font-weight: bold;
+            background: #ddd;
+            padding: 3px;
+            border: 1px solid #000;
+            display: block;
+            font-size: 10px;
+        }
+        .contenido-sec {
+            border: 1px solid #000;
+            border-top: none;
+            padding: 5px;
+            min-height: 30px;
+            white-space: pre-wrap;
+        }
+
+        /* FIRMAS */
+        .firmas { margin-top: 40px; width: 100%; page-break-inside: avoid; }
+        .box { width: 40%; float: left; text-align: center; margin-left: 5%; margin-right: 5%; }
+        .linea { border-top: 1px solid #000; margin-top: 40px; padding-top: 5px; }
+        .clearfix::after { content: ""; clear: both; display: table; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SECRETARÍA DE EDUCACIÓN</h1>
+        <h2>{{ zona_escolar }}</h2>
+        <h3>ESCUELA: {{ escuela }}</h3>
+    </div>
+
+    <div class="titulo-reporte">REVISIÓN DE CONSEJO TÉCNICO ESCOLAR (CTE)</div>
+    <div style="text-align: right; font-weight: bold; margin-bottom: 10px;">FECHA: {{ fecha }}</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width:5%">No.</th>
+                <th style="width:50%">Indicador</th>
+                <th style="width:5%">SÍ</th>
+                <th style="width:5%">NO</th>
+                <th style="width:35%">Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in indicadores %}
+            <tr>
+                <td style="text-align:center;">7.{{ loop.index }}</td>
+                <td>{{ item.texto }}</td>
+                <td style="text-align:center;">{% if item.valor == 'SI' %}X{% endif %}</td>
+                <td style="text-align:center;">{% if item.valor == 'NO' %}X{% endif %}</td>
+                <td>{{ item.obs }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="seccion">
+        <span class="titulo-sec">TEMAS TRATADOS Y OBSERVACIONES</span>
+        <div class="contenido-sec">{{ temas }}</div>
+    </div>
+    
+    <div class="seccion">
+        <span class="titulo-sec">SEGUIMIENTO PEMC / ALUMNOS EN RIESGO</span>
+        <div class="contenido-sec">{{ pemc }}</div>
+    </div>
+    
+    <div class="seccion">
+        <span class="titulo-sec">ACUERDOS Y COMPROMISOS</span>
+        <div class="contenido-sec">{{ acuerdos }}</div>
+    </div>
+
+    <div class="firmas clearfix">
+        <div class="box">
+            <div class="linea">
+                <strong>{{ supervisor }}</strong><br>SUPERVISOR ESCOLAR
+            </div>
+        </div>
+        <div class="box">
+            <div class="linea">
+                <strong>DIRECTOR / PRESIDENTE CTE</strong><br>Nombre y Firma
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supervisor v.1 - PIPCE</title>
+    <title>Supervisor v.1 - Inventarios</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -28,11 +28,11 @@
         <main class="flex-grow p-4 flex flex-col items-center">
             <div class="w-full max-w-6xl space-y-4">
                 <div class="embossed bg-white p-4 rounded-lg shadow-xl border border-gray-200 text-center">
-                    <h1 class="text-2xl font-extrabold text-gray-800">Registro: Protección Civil (PIPCE)</h1>
+                    <h1 class="text-2xl font-extrabold text-gray-800">Registro: Inventario Escolar</h1>
                 </div>
 
                 <div class="embossed bg-white p-6 rounded-lg shadow-xl border border-gray-200">
-                    <form action="{{ url_for('guardar_pipce') }}" method="POST" target="_blank">
+                    <form action="{{ url_for('guardar_inventarios') }}" method="POST" target="_blank">
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
@@ -63,26 +63,24 @@
                                 </thead>
                                 <tbody>
                                     {% set indicadores = [
-                                        "Documento Vigente: ¿El PIPCE está actualizado y validado por la autoridad correspondiente?",
-                                        "Unidad Interna (UIPC): ¿Está formalmente constituida el Acta de Instalación de la UIPC con firmas?",
-                                        "Análisis de Riesgos: ¿Incluye diagnóstico de riesgos internos (instalaciones) y externos?",
-                                        "Brigadas Constituidas: ¿Existen las 4 brigadas básicas (Evacuación, Primeros Auxilios, Incendios, Búsqueda)?",
-                                        "Directorios de Emergencia: ¿Los números de emergencia están actualizados y visibles?",
-                                        "Equipamiento (Extintores): ¿Cuentan con extintores suficientes, vigentes y bien colocados?",
-                                        "Sistema de Alertamiento: ¿Disponen de alarma audible en todo el plantel conocida por la comunidad?",
-                                        "Señalización Normativa: ¿Cuentan con señales oficiales (Ruta de Evacuación, Punto de Reunión)?",
-                                        "Cronograma de Riesgos: ¿La programación de simulacros contempla distintos escenarios de riesgo (sismo, incendio, etc.)?",
-                                        "Capacitación: ¿El personal y brigadas han recibido capacitación reciente en protección civil?",
-                                        "Evaluación y Bitácora: ¿Se realiza una evaluación posterior a cada simulacro y se registran los resultados en la bitácora?"
+                                        "Inventario Oficial: ¿Cuenta con el inventario general actualizado y validado por la autoridad competente?",
+                                        "Resguardos Individuales: ¿Existen resguardos firmados por cada docente/administrativo de los bienes bajo su custodia?",
+                                        "Etiquetado: ¿Los bienes cuentan con número de inventario o etiqueta visible y legible?",
+                                        "Verificación Física (Muestreo): ¿Existe correspondencia física al verificar aleatoriamente 5 artículos contra el listado?",
+                                        "Trámite de Bajas: ¿El mobiliario inservible cuenta con dictamen de baja o trámite en proceso (no solo arrumbado)?",
+                                        "Equipo Tecnológico: ¿El equipo de cómputo y audiovisual está completo, funcional y resguardado seguro?",
+                                        "Donaciones y Adquisiciones: ¿Se han incorporado al inventario los bienes adquiridos por APF, Cooperativa o donaciones?",
+                                        "Control de Llaves: ¿Existe un control/duplicado de llaves de las áreas con bienes de alto valor?",
+                                        "Reportes de Robo/Extravío: ¿En caso de faltantes, se cuenta con denuncia ante MP y notificación oficial?",
+                                        "Almacenamiento: ¿Las bodegas están ordenadas, limpias y libres de material de riesgo?"
                                     ] %}
-                                    
-                                    {% for i in range(1, 12) %}
+                                    {% for i in range(1, 11) %}
                                     <tr class="hover:bg-gray-50">
-                                        <td class="border px-4 py-2 font-bold align-top">5.{{ i }}</td>
+                                        <td class="border px-4 py-2 font-bold align-top">6.{{ i }}</td>
                                         <td class="border px-4 py-2 text-xs">{{ indicadores[i-1] }}</td>
-                                        <td class="border px-4 py-2 text-center align-top"><input type="radio" name="ind_5_{{i}}" value="SI"></td>
-                                        <td class="border px-4 py-2 text-center align-top"><input type="radio" name="ind_5_{{i}}" value="NO"></td>
-                                        <td class="border px-4 py-2 align-top"><input type="text" name="obs_5_{{i}}" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
+                                        <td class="border px-4 py-2 text-center align-top"><input type="radio" name="ind_6_{{i}}" value="SI"></td>
+                                        <td class="border px-4 py-2 text-center align-top"><input type="radio" name="ind_6_{{i}}" value="NO"></td>
+                                        <td class="border px-4 py-2 align-top"><input type="text" name="obs_6_{{i}}" class="w-full border-gray-300 rounded px-2 py-1 border"></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -90,22 +88,18 @@
                         </div>
 
                         <div class="space-y-6 mb-8 flex flex-col items-center w-full">
-                            
                             <div class="w-full md:w-3/4">
-                                <label class="block font-bold text-gray-700 mb-1">OBSERVACIONES GENERALES:</label>
-                                <textarea name="obs_general" rows="4" class="w-full border border-gray-300 rounded px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"></textarea>
+                                <label class="block font-bold text-gray-700 mb-1">DISCREPANCIAS DETECTADAS:</label>
+                                <textarea name="discrepancias" rows="4" class="w-full border border-gray-300 rounded px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"></textarea>
                             </div>
-
                             <div class="w-full md:w-3/4">
-                                <label class="block font-bold text-gray-700 mb-1">PROGRAMACIÓN DE SIMULACROS:</label>
-                                <textarea name="obs_simulacros" rows="4" class="w-full border border-gray-300 rounded px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"></textarea>
+                                <label class="block font-bold text-gray-700 mb-1">ESTADO GENERAL DEL MOBILIARIO:</label>
+                                <textarea name="estado_general" rows="4" class="w-full border border-gray-300 rounded px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"></textarea>
                             </div>
-
                             <div class="w-full md:w-3/4">
-                                <label class="block font-bold text-gray-700 mb-1">ACUERDOS Y COMPROMISOS:</label>
-                                <textarea name="acuerdos_pipce" rows="4" class="w-full border border-gray-300 rounded px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"></textarea>
+                                <label class="block font-bold text-gray-700 mb-1">NECESIDADES DE EQUIPAMIENTO:</label>
+                                <textarea name="necesidades" rows="4" class="w-full border border-gray-300 rounded px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500"></textarea>
                             </div>
-
                         </div>
 
                         <div class="flex justify-center space-x-4">
