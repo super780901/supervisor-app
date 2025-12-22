@@ -150,33 +150,43 @@ def login():
         return redirect(url_for('menu'))
     return render_template('index.html')
 
+# --- REEMPLAZA TU FUNCIÓN MENU ANTIGUA POR ESTA ---
+
 @app.route('/menu')
 def menu():
-    # 1. Recuperar nombre de la sesión
-    user_name = session.get('nombre')
+    # 1. Verificamos si hay un ID de usuario en la sesión
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     
-    # 2. Proteger la ruta: Si no hay usuario, mandar al login
-    if not user_name:
+    # 2. Buscamos al usuario en la Base de Datos (IGUAL QUE EN LOS OTROS MÓDULOS)
+    usuario = User.query.get(session['user_id'])
+    
+    # 3. Seguridad: Si el usuario no aparece en la BD, limpiamos y sacamos
+    if not usuario:
+        session.clear()
         return redirect(url_for('login'))
 
-    # 3. Mostrar menú con el nombre
-    return render_template('menu.html', user_name=user_name)
-
+    # 4. Renderizamos el menú pasando el NOMBRE REAL de la base de datos
+    return render_template('menu.html', user_name=usuario.nombre)
 
 # app.py
 
 @app.route('/submenu_registro')
 def submenu_registro():
-    # 1. Verificar seguridad (que esté logueado)
-    if not session.get('user_id'):
+    # 1. Seguridad: Si no hay sesión, al login
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # 2. Buscamos al usuario
+    usuario = User.query.get(session['user_id'])
+    
+    # 3. Seguridad anti-bucle: Si el usuario no existe en BD
+    if not usuario:
+        session.clear()
         return redirect(url_for('login'))
         
-    # 2. Obtener el nombre para el saludo
-    user_name = session.get('user_name', 'Usuario')
-    
-    # 3. Mostrar la nueva página
-    return render_template('submenu_registro.html', user_name=user_name)
-
+    # 4. AQUÍ ESTÁ EL CAMBIO: Llamamos a 'menu.html'
+    return render_template('menu.html', user_name=usuario.nombre)
 
 @app.route('/registro_usuario')
 def registro_usuario():
