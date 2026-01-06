@@ -3,7 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask import make_response # Agrega esto si no está
 from weasyprint import HTML     # Esto es lo nuevo
-
+##import pdfkit  # <--- ¡ESTA ES LA QUE FALTA Y CAUSA EL ERROR!
+# --- 1.1 AGREGAR AL INICIO DE APP.PY (Junto a los otros imports) ---
+from flask import make_response
+import pdfkit
+import platform  # <--- Para detectar si es Windows o Linux
 # Inicializa la aplicación Flask
 app = Flask(__name__)
 
@@ -171,22 +175,26 @@ def menu():
 
 # app.py
 
-@app.route('/submenu_registro')
-def submenu_registro():
-    # 1. Seguridad: Si no hay sesión, al login
+# En app.py
+
+@app.route('/submenu_registro')  # <-- Esta es la dirección URL
+def submenu_registro():          # <-- Este es el NOMBRE DE LA FUNCIÓN (El Puente)
+    
+    # 1. Protección: Si no está logueado, va pa' fuera
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    # 2. Buscamos al usuario
+    # 2. Obtener datos del usuario (para que salga su nombre)
     usuario = User.query.get(session['user_id'])
     
-    # 3. Seguridad anti-bucle: Si el usuario no existe en BD
+    # 3. Cargar el archivo destino
+    # OJO: Aquí debe decir exactamente el nombre de tu archivo
+    return render_template('submenu_registro.html', user_name=usuario.nombre if usuario else "Usuario")
+
+    # 4 . Seguridad anti-bucle: Si el usuario no existe en BD
     if not usuario:
         session.clear()
         return redirect(url_for('login'))
-        
-    # 4. AQUÍ ESTÁ EL CAMBIO: Llamamos a 'menu.html'
-    return render_template('menu.html', user_name=usuario.nombre)
 
 @app.route('/registro_usuario')
 def registro_usuario():
@@ -488,41 +496,7 @@ class Asistencia(db.Model):
     irregularidades = db.Column(db.Text)
     recomendaciones = db.Column(db.Text)
 
-# --- RUTAS ---
-@app.route('/registro_asistencia')
-def registro_asistencia():
-    if not session.get('user_id'): return redirect(url_for('login'))
-    user_name = session.get('user_name')
-    mis_escuelas = Escuela.query.filter_by(user_id=session['user_id']).all()
-    return render_template('registro_asistencia.html', user_name=user_name, escuelas=mis_escuelas)
 
-@app.route('/guardar_asistencia', methods=['POST'])
-def guardar_asistencia():
-    if not session.get('user_id'): return redirect(url_for('login'))
-    
-    nuevo = Asistencia(
-        user_id=session['user_id'],
-        escuela_id=request.form.get('escuela_id'),
-        fecha=request.form.get('fecha_revision'),
-        
-        ind_3_1=request.form.get('ind_3_1'), obs_3_1=request.form.get('obs_3_1'),
-        ind_3_2=request.form.get('ind_3_2'), obs_3_2=request.form.get('obs_3_2'),
-        ind_3_3=request.form.get('ind_3_3'), obs_3_3=request.form.get('obs_3_3'),
-        ind_3_4=request.form.get('ind_3_4'), obs_3_4=request.form.get('obs_3_4'),
-        ind_3_5=request.form.get('ind_3_5'), obs_3_5=request.form.get('obs_3_5'),
-        ind_3_6=request.form.get('ind_3_6'), obs_3_6=request.form.get('obs_3_6'),
-        ind_3_7=request.form.get('ind_3_7'), obs_3_7=request.form.get('obs_3_7'),
-        ind_3_8=request.form.get('ind_3_8'), obs_3_8=request.form.get('obs_3_8'),
-        ind_3_9=request.form.get('ind_3_9'), obs_3_9=request.form.get('obs_3_9'),
-        ind_3_10=request.form.get('ind_3_10'), obs_3_10=request.form.get('obs_3_10'),
-
-        personal_incidencias=request.form.get('personal_incidencias'),
-        irregularidades=request.form.get('irregularidades'),
-        recomendaciones=request.form.get('recomendaciones')
-    )
-    db.session.add(nuevo)
-    db.session.commit()
-    return redirect(url_for('submenu_registro'))
 
 # app.py - Modelo para CTE
 # --- MODELO CTE (Módulo 7) ---
@@ -1171,6 +1145,107 @@ def descargar_pdf_pipce(id_reporte):
     response.headers['Content-Disposition'] = f'attachment; filename=PIPCE_{escuela.nombre}.pdf'
     return response
 
+# --- AGREGAR EN APP.PY ---
+
+@app.route('/registro_asistencia')
+def registro_asistencia():
+    # 1. Seguridad: Verificar login
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # 2. Obtener datos necesarios
+    usuario = User.query.get(session['user_id'])
+    escuelas = Escuela.query.all()  # <--- IMPORTANTE: Necesario para llenar el select de escuelas
+    
+    # 3. Mostrar la página
+    return render_template('registro_asistencia.html', 
+                           user_name=usuario.nombre, 
+                           escuelas=escuelas)
+
+
+# --- 1.2 LA FUNCIÓN COMPLETA (Reemplaza cualquier versión anterior de guardar_asistencia) ---
+@app.route('/guardar_asistencia', methods=['POST'])
+def guardar_asistencia():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    usuario = User.query.get(session['user_id'])
+    
+    # 1. Recibir datos del formulario
+    escuela_id = request.form.get('escuela_id')
+    fecha_revision = request.form.get('fecha_revision')
+    
+    # Buscar nombre de la escuela
+    obj_escuela = Escuela.query.get(escuela_id)
+    nombre_escuela = obj_escuela.nombre if obj_escuela else "Desconocida"
+    # Ajusta esto si tienes la zona en la BD
+    zona_texto = "ZONA ESCOLAR 078" 
+
+    # 2. Armar la lista de indicadores
+# ... dentro de def guardar_asistencia(): ...
+
+    # 2. Armar la lista de indicadores (VERSIÓN CON TEXTO COMPLETO)
+    textos_indicadores = [
+        "Disponibilidad y Ubicación: ¿El libro se encuentra en un lugar accesible y visible al momento de la visita?",
+        "Apertura Oficial: ¿Cuenta con la autorización y sello de apertura por parte de la Supervisión Escolar al inicio del ciclo?",
+        "Formato e Integridad: ¿El libro está libre de tachaduras, enmendaduras, uso de corrector o renglones en blanco injustificados?",
+        "Registro Cronológico: ¿Los registros de asistencia corresponden estrictamente al día en curso (sin firmas adelantadas)?",
+        "Horarios Contractuales: ¿La hora de entrada registrada por los docentes coincide con su horario laboral oficial?",
+        "Registro de Salida: ¿El personal registra su hora de salida al término de la jornada laboral?",
+        "Firmas Autógrafas: ¿Las firmas corresponden al puño y letra del personal (se descarta firma de terceros)?",
+        "Registro de Incidencias: ¿Están señaladas claramente las inasistencias, retardos, permisos económicos o licencias médicas en el día correspondiente?",
+        "Cierre Diario: ¿El director cancela los espacios vacíos y cierra el registro diariamente con su firma/visto bueno?",
+        "Plantilla Completa: ¿Coincide el número de personas registradas (o justificadas) con la plantilla de personal real de la escuela?"
+    ]
+    
+    # ... el resto de la función sigue igual ...
+    
+    lista_indicadores = []
+    for i in range(1, 11):
+        lista_indicadores.append({
+            'numero': f"3.{i}",
+            'texto': textos_indicadores[i-1],
+            'valor': request.form.get(f'ind_3_{i}', ''), 
+            'obs': request.form.get(f'obs_3_{i}', '')
+        })
+
+    # 3. Recibir textos largos
+    personal = request.form.get('personal_incidencias', '')
+    irregularidades = request.form.get('irregularidades', '')
+    recomendaciones = request.form.get('recomendaciones', '')
+
+    # 4. Generar el PDF
+    html_content = render_template(
+        'pdf_asistencia.html',
+        zona_escolar=zona_texto,
+        escuela=nombre_escuela,
+        fecha=fecha_revision,
+        supervisor=usuario.nombre,
+        indicadores=lista_indicadores,
+        personal_incidencias=personal,
+        irregularidades=irregularidades,
+        recomendaciones=recomendaciones
+    )
+
+    # Configuración de PDF (Directo al navegador)
+   # ... (código anterior del render_template) ...
+
+    # --- CONFIGURACIÓN INTELIGENTE (DETECTA WINDOWS O LINUX) ---
+    if platform.system() == "Windows":
+        # Ruta para TU computadora
+        path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+    else:
+        # Ruta para el SERVIDOR (PythonAnywhere)
+        # En PythonAnywhere suele estar en /usr/bin/wkhtmltopdf
+        path_wkhtmltopdf = '/usr/bin/wkhtmltopdf'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+    # Generamos el PDF usando la configuración detectada
+    pdf = pdfkit.from_string(html_content, False, configuration=config)
+    
+    response = make_response(pdf)
+    # ... (resto de la función igual) ...
 
 
 # --------------------------
